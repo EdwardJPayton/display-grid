@@ -1,0 +1,133 @@
+// Display Grid - a CSS Grid based on display:inline-block awesomeness
+// Not a float in sight!
+// Features: 
+// Responsive, flexable width columns, fixed width gutters, intuitive and simple to use, supports IE8 and above
+
+// Inspired by http://codepen.io/davidicus/pen/vxIra
+
+// HTML Structure:
+// div.grid-wrap (The full container width)
+//   div.grid-row (The grid items container)
+//     div.grid-<num> (the grid item)
+//     div.grid-row (nested grid items container)
+//       div.grid-<num> (nested grid item)
+
+// How to use: 
+// Insert your CSS reset of choice
+// The grid works best using the body font-size 62.5% method
+
+// Variables
+$max-width: 600;
+$columns: 12;
+$w4: 400; // Responsive variable for changing grid widths to 100% - This can be any number
+
+// Grid Container
+.grid-wrap {
+  margin: auto;
+  max-width: $max-width + px;
+  overflow: hidden;
+  width: 100%;
+}
+
+// Grid Rows
+.grid-row {
+  // This padding and left centers the grid in the wrapper
+  left: -5px;
+  padding: 0 5px;
+  position: relative;
+  width: 100%;
+}
+
+// Nested Grid Rows
+%grid-padding {
+  padding: 0 0 0 10px;
+}
+
+%grid-padding-first {
+  padding: 0;
+}
+
+.grid-row .grid-row {
+  left: 0;
+  padding: 0;
+  // Nested Grid Items
+  @for $i from 1 through $columns {
+    .grid-#{$i} {
+      @extend %grid-padding;
+
+      &:first-child {
+        @extend %grid-padding-first;
+      }
+    }
+  }
+}
+// *Nested grids need more testing - three levels down the column/gutter alignment breaks down*
+
+// Grid Columns extend and loop
+%grid {
+  display: inline-block;
+  margin: auto -.25em auto auto; // margin-right can be either px or em. Em size works best when using font-size:62.5% method
+  padding-left: 10px;
+  vertical-align: top;
+}
+
+@for $i from 1 through $columns {
+  .grid-#{$i} {
+    @extend %grid;
+    width: ($i / $columns) * 100%;
+  }
+}
+
+// Grid Inline inherits grid settings without a width
+.grid-inline {
+  @extend %grid;
+}
+
+// Push Columns moves columns left
+// (if one column is pushed then all following columns must be pushed too)
+$push-columns: $columns - 1;
+
+%push {
+  position: relative;
+}
+
+@for $i from 1 through $push-columns {
+  .push-#{$i} {
+    @extend %push;
+    left: ($i / $columns) * 100%;
+  }
+}
+
+// Small Screen Media Query
+@media only screen and (max-width: ($w4 - 1px)) {
+  %small-push {
+    left: 0;
+  }
+
+  %small-grid {
+    width: 100%;
+  }
+
+  %small-grid-row {
+    margin-right: 0;
+    padding: 0;
+  }
+
+  @for $i from 1 through $push-columns {
+    .push-#{$i} {
+      @extend %small-push;
+    }
+  }
+
+  @for $i from 1 through $columns {
+    .grid-#{$i} {
+      @extend %small-grid;
+    }
+
+    .grid-row .grid-row {
+      .grid-#{$i} {
+        @extend %small-grid-row;
+      }
+    }
+  }
+}
